@@ -184,97 +184,10 @@
       color: var(--text-main);
       font-weight: 500;
     }
-
-    /* UNLOCK OVERLAY */
-    #unlock-overlay {
-      position: fixed;
-      inset: 0;
-      background: rgba(5, 8, 22, 0.95);
-      backdrop-filter: blur(8px);
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-    }
-
-    #unlock-box {
-      background: #0d1224;
-      padding: 40px 50px;
-      border-radius: 22px;
-      text-align: center;
-      border: 1px solid rgba(148,163,255,0.25);
-      box-shadow: 0 0 40px rgba(91,141,255,0.25);
-    }
-
-    #unlock-box h2 {
-      margin: 0 0 12px;
-      font-size: 30px;
-    }
-
-    #grid {
-      display: grid;
-      grid-template-columns: repeat(3, 90px);
-      gap: 14px;
-      margin: 24px auto;
-    }
-
-    .cell {
-      width: 90px;
-      height: 90px;
-      background: #141a2e;
-      border-radius: 14px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-size: 30px;
-      cursor: pointer;
-      border: 1px solid rgba(148,163,255,0.25);
-      transition: background 0.2s, transform 0.15s;
-    }
-
-    .cell:hover {
-      transform: scale(1.06);
-    }
-
-    .cell.clicked {
-      background: linear-gradient(135deg, #5b8dff, #9b5bff);
-      color: white;
-      border-color: rgba(255,255,255,0.4);
-    }
-
-    #unlock-overlay.fade-out {
-      animation: fadeOut 0.6s forwards;
-    }
-
-    @keyframes fadeOut {
-      to { opacity: 0; visibility: hidden; }
-    }
   </style>
 </head>
 
 <body>
-
-<!-- UNLOCK OVERLAY -->
-<div id="unlock-overlay">
-  <div id="unlock-box">
-    <h2>Unlock Dashboard</h2>
-    <p>Enter the pattern to continue</p>
-
-    <div id="grid">
-      <div class="cell" data-num="1">1</div>
-      <div class="cell" data-num="2">2</div>
-      <div class="cell" data-num="3">3</div>
-      <div class="cell" data-num="4">4</div>
-      <div class="cell" data-num="5">5</div>
-      <div class="cell" data-num="6">6</div>
-      <div class="cell" data-num="7">7</div>
-      <div class="cell" data-num="8">8</div>
-      <div class="cell" data-num="9">9</div>
-    </div>
-
-    <p id="unlock-status"></p>
-  </div>
-</div>
 
 <div class="container">
   <div class="header">
@@ -376,35 +289,6 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-
-<script>
-  const correctPattern = ["1", "2", "3", "6", "9"];
-  let userPattern = [];
-
-  const cells = document.querySelectorAll(".cell");
-  const statusText = document.getElementById("unlock-status");
-  const overlay = document.getElementById("unlock-overlay");
-
-  cells.forEach(cell => {
-    cell.addEventListener("click", () => {
-      const num = cell.dataset.num;
-      userPattern.push(num);
-      cell.classList.add("clicked");
-
-      if (userPattern.length === correctPattern.length) {
-        const isCorrect = userPattern.every((v, i) => v === correctPattern[i]);
-
-        if (isCorrect) {
-          statusText.textContent = "Unlocked!";
-          overlay.classList.add("fade-out");
-          setTimeout(() => overlay.remove(), 600);
-        } else {
-          window.location.href = "https://google.com";
-        }
-      }
-    });
-  });
-</script>
 
 <script type="module">
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -520,29 +404,32 @@
     const disk = data.disk_usage_percent ?? 0;
 
     setText("cpu-text", cpu.toFixed(0) + "%");
-    setText("ram-text", ram.toFixed(0)
     setText("ram-text", ram.toFixed(0) + "%");
-setText("gpu-text", data.gpu_usage != null ? gpu.toFixed(0) + "%" : "N/A");
-setText("battery-text", data.battery_percent != null ? battery.toFixed(0) + "%" : "N/A");
+    setText("gpu-text", data.gpu_usage != null ? gpu.toFixed(0) + "%" : "N/A");
+    setText("battery-text", data.battery_percent != null ? battery.toFixed(0) + "%" : "N/A");
 
-setBar("cpu-bar", cpu);
-setBar("ram-bar", ram);
-setBar("gpu-bar", data.gpu_usage != null ? gpu : 0);
-setBar("battery-bar", battery);
-setBar("disk-bar", disk);
+    setBar("cpu-bar", cpu);
+    setBar("ram-bar", ram);
+    setBar("gpu-bar", data.gpu_usage != null ? gpu : 0);
+    setBar("battery-bar", battery);
+    setBar("disk-bar", disk);
 
-setText("disk-text", disk.toFixed(0) + "%");
-setText("net-speed-text", `${(data.net_up_mbps ?? 0).toFixed(2)} ↑ / ${(data.net_down_mbps ?? 0).toFixed(2)} ↓ Mbps`);
-setText("net-sent-text", (data.net_sent_mb ?? 0).toFixed(1) + " MB");
-setText("net-recv-text", (data.net_recv_mb ?? 0).toFixed(1) + " MB");
+    setText("disk-text", disk.toFixed(0) + "%");
+    setText("net-speed-text", `${(data.net_up_mbps ?? 0).toFixed(2)} ↑ / ${(data.net_down_mbps ?? 0).toFixed(2)} ↓ Mbps`);
+    setText("net-sent-text", (data.net_sent_mb ?? 0).toFixed(1) + " MB");
+    setText("net-recv-text", (data.net_recv_mb ?? 0).toFixed(1) + " MB");
 
-setText("os-text", data.os ?? "–");
-setText("cpu-model-text", data.cpu_model || "–");
-setText("ram-detail-text", data.ram_total_gb != null ? `${data.ram_used_gb.toFixed(1)} / ${data.ram_total_gb.toFixed(1)} GB` : "–");
-setText("disk-detail-text", data.disk_total_gb != null ? `${data.disk_used_gb.toFixed(1)} / ${data.disk_total_gb.toFixed(1)} GB` : "–");
-setText("uptime-text", data.uptime_minutes != null ? `${data.uptime_minutes.toFixed(1)} min` : "–");
+    setText("os-text", data.os ?? "–");
+    setText("cpu-model-text", data.cpu_model || "–");
+    setText("ram-detail-text", data.ram_total_gb != null ? `${data.ram_used_gb.toFixed(1)} / ${data.ram_total_gb.toFixed(1)} GB` : "–");
+    setText("disk-detail-text", data.disk_total_gb != null ? `${data.disk_used_gb.toFixed(1)} / ${data.disk_total_gb.toFixed(1)} GB` : "–");
+    setText("uptime-text", data.uptime_minutes != null ? `${data.uptime_minutes.toFixed(1)} min` : "–");
 
-setText("updated", "Updated at " + new Date().toLocaleTimeString());
+    setText("updated", "Updated at " + new Date().toLocaleTimeString());
 
-pushHistory(new Date().toLocaleTimeString(), cpu, ram, data.gpu_usage);
-});
+    pushHistory(new Date().toLocaleTimeString(), cpu, ram, data.gpu_usage);
+  });
+</script>
+
+</body>
+</html>
