@@ -21,25 +21,28 @@
     <div class="row"><span class="label">Last update</span><span class="value" id="updated">–</span></div>
   </div>
 
-  <script>
-    const URL = "https://laptop-stats-default-rtdb.europe-west1.firebasedatabase.app/laptop.json";
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-    async function loadStats() {
-      try {
-        const res = await fetch(URL);
-        const data = await res.json();
+  const firebaseConfig = {
+    databaseURL: "https://laptop-stats-default-rtdb.europe-west1.firebasedatabase.app"
+  };
 
-        document.getElementById("cpu").textContent = data.cpu + "%";
-        document.getElementById("ram").textContent = data.ram + "%";
-        document.getElementById("battery").textContent = data.battery + "%";
-        document.getElementById("updated").textContent = new Date().toLocaleTimeString();
-      } catch (e) {
-        document.getElementById("updated").textContent = "error";
-      }
-    }
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+  const statsRef = ref(db, "laptop");
 
-    loadStats();
-    setInterval(loadStats, 5000);
-  </script>
+  onValue(statsRef, (snapshot) => {
+    const data = snapshot.val();
+    if (!data) return;
+
+    document.getElementById("cpu").textContent = data.cpu + "%";
+    document.getElementById("ram").textContent = data.ram + "%";
+    document.getElementById("battery").textContent = data.battery + "%";
+    document.getElementById("updated").textContent = new Date().toLocaleTimeString();
+  });
+</script>
+
 </body>
 </html>
