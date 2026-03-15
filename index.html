@@ -3,46 +3,119 @@
 <head>
   <meta charset="UTF-8">
   <title>Laptop Stats</title>
+
   <style>
-    body { font-family: system-ui, sans-serif; padding: 2rem; background: #0b1020; color: #f5f5f5; }
-    h1 { margin-bottom: 1rem; }
-    .card { background: #151a30; padding: 1.5rem; border-radius: 0.75rem; max-width: 400px; }
-    .row { display: flex; justify-content: space-between; margin: 0.25rem 0; }
-    .label { opacity: 0.7; }
-    .value { font-weight: 600; }
+    body {
+      font-family: "Inter", system-ui, sans-serif;
+      background: #0a0f1f;
+      color: #e8e8e8;
+      margin: 0;
+      padding: 40px;
+      display: flex;
+      justify-content: center;
+    }
+
+    .container {
+      width: 420px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+
+    .card {
+      background: #141a2e;
+      padding: 20px 24px;
+      border-radius: 14px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.35);
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px rgba(0,0,0,0.45);
+    }
+
+    .section-title {
+      font-size: 14px;
+      opacity: 0.7;
+      margin-bottom: 10px;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    .row {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .row:last-child {
+      border-bottom: none;
+    }
+
+    .label {
+      opacity: 0.75;
+      font-size: 15px;
+    }
+
+    .value {
+      font-weight: 600;
+      font-size: 16px;
+    }
+
+    .updated {
+      text-align: center;
+      margin-top: 10px;
+      opacity: 0.6;
+      font-size: 13px;
+    }
   </style>
 </head>
+
 <body>
-  <h1>Laptop Stats</h1>
-  <div class="card">
-    <div class="row"><span class="label">CPU</span><span class="value" id="cpu">–</span></div>
-    <div class="row"><span class="label">RAM</span><span class="value" id="ram">–</span></div>
-    <div class="row"><span class="label">Battery</span><span class="value" id="battery">–</span></div>
-    <div class="row"><span class="label">Last update</span><span class="value" id="updated">–</span></div>
+  <div class="container">
+    <h1>Laptop Stats</h1>
+
+    <div class="card">
+      <div class="section-title">Live Metrics</div>
+
+      <div class="row"><span class="label">CPU Usage</span><span class="value" id="cpu">–</span></div>
+      <div class="row"><span class="label">RAM Usage</span><span class="value" id="ram">–</span></div>
+      <div class="row"><span class="label">Battery</span><span class="value" id="battery">–</span></div>
+
+      <div class="updated" id="updated">Waiting for data…</div>
+    </div>
   </div>
 
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-  import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
 
-  const firebaseConfig = {
-    databaseURL: "https://laptop-stats-default-rtdb.europe-west1.firebasedatabase.app"
-  };
+    const firebaseConfig = {
+      databaseURL: "https://laptop-stats-default-rtdb.europe-west1.firebasedatabase.app"
+    };
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  const statsRef = ref(db, "laptop");
+    const app = initializeApp(firebaseConfig);
+    const db = getDatabase(app);
+    const statsRef = ref(db, "laptop");
 
-  onValue(statsRef, (snapshot) => {
-    const data = snapshot.val();
-    if (!data) return;
+    onValue(statsRef, (snapshot) => {
+      const data = snapshot.val();
+      if (!data) return;
 
-    document.getElementById("cpu").textContent = data.cpu + "%";
-    document.getElementById("ram").textContent = data.ram + "%";
-    document.getElementById("battery").textContent = data.battery + "%";
-    document.getElementById("updated").textContent = new Date().toLocaleTimeString();
-  });
-</script>
-
+      document.getElementById("cpu").textContent = data.cpu + "%";
+      document.getElementById("ram").textContent = data.ram + "%";
+      document.getElementById("battery").textContent = data.battery + "%";
+      document.getElementById("updated").textContent = "Updated at " + new Date().toLocaleTimeString();
+    });
+  </script>
 </body>
 </html>
