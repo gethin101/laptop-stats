@@ -2,12 +2,12 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Laptop Stats</title>
+  <title>Laptop Dashboard</title>
 
   <style>
     body {
       font-family: "Inter", system-ui, sans-serif;
-      background: #0a0f1f;
+      background: #0b0f1e;
       color: #e8e8e8;
       margin: 0;
       padding: 40px;
@@ -16,10 +16,10 @@
     }
 
     .container {
-      width: 420px;
+      width: 900px;
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 30px;
     }
 
     h1 {
@@ -27,11 +27,18 @@
       font-weight: 600;
       letter-spacing: 0.5px;
       margin-bottom: 10px;
+      font-size: 32px;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: 20px;
     }
 
     .card {
       background: #141a2e;
-      padding: 20px 24px;
+      padding: 22px;
       border-radius: 14px;
       box-shadow: 0 8px 20px rgba(0,0,0,0.35);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -45,54 +52,87 @@
     .section-title {
       font-size: 14px;
       opacity: 0.7;
-      margin-bottom: 10px;
+      margin-bottom: 14px;
       text-transform: uppercase;
       letter-spacing: 1px;
     }
 
-    .row {
-      display: flex;
-      justify-content: space-between;
-      padding: 10px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.06);
+    .metric {
+      margin-bottom: 18px;
     }
 
-    .row:last-child {
-      border-bottom: none;
-    }
-
-    .label {
+    .metric-label {
+      font-size: 14px;
       opacity: 0.75;
-      font-size: 15px;
+      margin-bottom: 6px;
     }
 
-    .value {
+    .metric-value {
+      font-size: 18px;
       font-weight: 600;
-      font-size: 16px;
+      margin-bottom: 6px;
+    }
+
+    .bar {
+      width: 100%;
+      height: 8px;
+      background: #1f253d;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+
+    .bar-fill {
+      height: 100%;
+      background: linear-gradient(90deg, #4f8cff, #6a5cff);
+      width: 0%;
+      transition: width 0.3s ease;
     }
 
     .updated {
       text-align: center;
-      margin-top: 10px;
       opacity: 0.6;
       font-size: 13px;
+      margin-top: 10px;
     }
   </style>
 </head>
 
 <body>
   <div class="container">
-    <h1>Laptop Stats</h1>
+    <h1>Laptop Dashboard</h1>
 
-    <div class="card">
-      <div class="section-title">Live Metrics</div>
+    <div class="grid">
 
-      <div class="row"><span class="label">CPU Usage</span><span class="value" id="cpu">–</span></div>
-      <div class="row"><span class="label">RAM Usage</span><span class="value" id="ram">–</span></div>
-      <div class="row"><span class="label">Battery</span><span class="value" id="battery">–</span></div>
+      <div class="card">
+        <div class="section-title">CPU</div>
+        <div class="metric">
+          <div class="metric-label">Usage</div>
+          <div class="metric-value" id="cpu-text">–</div>
+          <div class="bar"><div class="bar-fill" id="cpu-bar"></div></div>
+        </div>
+      </div>
 
-      <div class="updated" id="updated">Waiting for data…</div>
+      <div class="card">
+        <div class="section-title">RAM</div>
+        <div class="metric">
+          <div class="metric-label">Usage</div>
+          <div class="metric-value" id="ram-text">–</div>
+          <div class="bar"><div class="bar-fill" id="ram-bar"></div></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="section-title">Battery</div>
+        <div class="metric">
+          <div class="metric-label">Level</div>
+          <div class="metric-value" id="battery-text">–</div>
+          <div class="bar"><div class="bar-fill" id="battery-bar"></div></div>
+        </div>
+      </div>
+
     </div>
+
+    <div class="updated" id="updated">Waiting for data…</div>
   </div>
 
   <script type="module">
@@ -107,13 +147,22 @@
     const db = getDatabase(app);
     const statsRef = ref(db, "laptop");
 
+    function updateBar(id, value) {
+      document.getElementById(id).style.width = value + "%";
+    }
+
     onValue(statsRef, (snapshot) => {
       const data = snapshot.val();
       if (!data) return;
 
-      document.getElementById("cpu").textContent = data.cpu + "%";
-      document.getElementById("ram").textContent = data.ram + "%";
-      document.getElementById("battery").textContent = data.battery + "%";
+      document.getElementById("cpu-text").textContent = data.cpu_percent + "%";
+      document.getElementById("ram-text").textContent = data.ram_percent + "%";
+      document.getElementById("battery-text").textContent = data.battery_percent + "%";
+
+      updateBar("cpu-bar", data.cpu_percent);
+      updateBar("ram-bar", data.ram_percent);
+      updateBar("battery-bar", data.battery_percent);
+
       document.getElementById("updated").textContent = "Updated at " + new Date().toLocaleTimeString();
     });
   </script>
